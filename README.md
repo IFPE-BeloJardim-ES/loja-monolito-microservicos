@@ -1,4 +1,4 @@
-# **Laboratório: a mesma loja, duas arquiteturas** 
+# Laboratório — a mesma loja, duas arquiteturas
 
 Estilos Arquiteturais V · Microsserviços 
 
@@ -6,13 +6,20 @@ Nomes: ____________________________________
 
 Vocês vão rodar a **mesma loja** de dois jeitos: como um **monolito** (um processo, um banco) e como **microsserviços** (quatro processos, um banco por serviço). As duas versões têm as mesmas rotas. Ninguém precisa programar — só um experimento pede para mudar um número no código. 
 
+Requisito: Python 3.8 ou superior. Nada para instalar. No macOS/Linux use `python3`.
+
+| Versão | Como subir | Endereço |
+|---|---|---|
+| Monolito | `python monolito.py` | http://localhost:8000 |
+| Microsserviços | `python iniciar_microsservicos.py` | http://localhost:9000 |
+
 O objetivo é descobrir, na prática, **onde os microsserviços ganham e onde eles cobram** . 
 
 |**Versão**|**Endereço**|**Onde ficam os dados**|
 |---|---|---|
 |Monolito|http://localhost:8000|dados/monolito.json|
 |Microsserviços|http://localhost:9000 (Vitrine)|dados/estoque.json e<br>dados/pedidos.json|
-|Rotas nas duas|/produto/1 · /comprar/1 · /relatorio||
+|Rotas nas duas| `/produto/1`, `/comprar/1`, `/relatorio`, `/bug/estoque`||
 |Derrubar um serviço|http://localhost:<porta>/desligar|Catálogo 9001 · Estoque 9002 ·<br>Pedidos 9003|
 
 **Faça** Abra dois terminais na pasta laboratorio. 
@@ -113,4 +120,5 @@ Na demonstração, o professor derrubou o Estoque e a loja em microsserviços **
 **Para fechar** Uma loja com **3 desenvolvedores** deveria usar qual das duas versões? E uma com **300** ? Usem o placar como argumento. 
 
 Para recomeçar do zero: desliguem tudo (Ctrl+C nos terminais) e rodem `python resetar.py`. 
+
 
