@@ -44,13 +44,17 @@ O time de vendas quer 10% de desconto. Vocês vão "publicar" essa mudança nas 
 
 **Deve aparecer** Depois da subida, o preço é R$ 225 nas duas. 
 
+> Valores abaixo são **estimados** para deixar o roteiro pronto. Na execução real, podem variar um pouco.
+
 ||**Monolito**|**Microsserviços**|
 |---|---|---|
-|Quanto tempo ficou fora do ar?|||
-|O que parou de funcionar?|||
-|O que continuou funcionando?|||
+|Quanto tempo ficou fora do ar?|~10 s (reinício total)|~4 s (só o Catálogo)|
+|O que parou de funcionar?|Tudo (`/produto`, `/comprar`, `/relatorio`)|Rotas que dependem do Catálogo (`/produto` e `/comprar`)|
+|O que continuou funcionando?|Nada na API|`/relatorio` continuou (depende de Pedidos + Estoque)|
 
 **Responda** Poder ou problema dos microsserviços? Por quê? 
+
+**Resposta estimada:** Poder, porque permite deploy isolado e reduz indisponibilidade global. Problema, porque exige coordenar processos e lidar com falhas parciais.
 
 ### **Experimento 2 · Latência** 
 
@@ -62,10 +66,12 @@ O time de vendas quer 10% de desconto. Vocês vão "publicar" essa mudança nas 
 
 ||**Monolito**|**Microsserviços**|
 |---|---|---|
-|Tempo médio por página (comparar.py)|||
-|tempo_interno_ms|||
+|Tempo médio por página (comparar.py)|~2,5 ms|~8,5 ms|
+|tempo_interno_ms|~0,02 ms|~2,00 ms|
 
 **Responda** Aqui tudo roda no mesmo computador. O que aconteceria com essa diferença se cada serviço estivesse numa máquina diferente? 
+
+**Resposta estimada:** A diferença aumentaria. Em máquinas separadas entram latência de rede, variação de rota, timeout e overhead de serialização em cada chamada entre serviços.
 
 ### - **Experimento 3 · Consistência** 
 
@@ -77,47 +83,51 @@ Na demonstração, o professor derrubou o Estoque e a loja em microsserviços **
 
 |**/relatorio (microsserviços)**|**Antes**|**Depois**|
 |---|---|---|
-|pedidos_confirmados|||
-|pedidos_pendentes|||
-|baixas_de_estoque|||
-|consistente|||
+|pedidos_confirmados|0|0|
+|pedidos_pendentes|0|2|
+|baixas_de_estoque|0|0|
+|consistente|true|false|
 
 
 **Faça** Abra a pasta dados/. Compare pedidos.json e estoque.json: cada banco conta uma história diferente. 
 
 **Responda** No monolito, o bug do Estoque derrubou a loja inteira: nenhuma venda, mas nenhum dado errado. Nos microsserviços, a loja vendeu, mas os bancos discordam. **Qual dos dois a loja prefere? Quem decide isso?** 
 
+**Resposta estimada:** Depende da regra de negócio. Se prioridade é não vender com dado inconsistente, monolito (ou fluxo transacional forte) é melhor. Se prioridade é não parar de vender, microsserviços com consistência eventual é melhor. Essa decisão é do negócio com arquitetura e operação.
+
 ### **Experimento 4 · Operação** 
 
 **Faça** Faça uma compra em cada versão (/comprar/2 nas duas) e olhe os terminais. 
 
-|**Para uma compra…**|**Monolito**<br>**Microsserviços**|
-|---|---|
-
-
-
-|Quantos processos estão rodando?|
-|---|
-|Quantas portas?|
-|Quantos arquivos de banco?|
-|Quantas linhas de log apareceram?|
-|Em quantos serviços?|
+|**Para uma compra...**|**Monolito**|**Microsserviços**|
+|---|---|---|
+|Quantos processos estão rodando?|1|4 (Vitrine + 3 serviços)|
+|Quantas portas?|1 (8000)|4 (9000, 9001, 9002, 9003)|
+|Quantos arquivos de banco?|1 (`dados/monolito.json`)|2 (`dados/pedidos.json` e `dados/estoque.json`)|
+|Quantas linhas de log apareceram?|~1|~5|
+|Em quantos serviços?|1|3 (Vitrine, Pedidos, Estoque) + Catálogo na consulta de preço|
 
 
 **Responda** Se a compra desse errado, onde vocês procurariam o erro em cada versão? 
+
+**Resposta estimada:** No monolito, olhar um processo e um log central já cobre quase tudo. Nos microsserviços, é preciso seguir a chamada entre Vitrine, Pedidos, Catálogo e Estoque, correlacionando logs de múltiplos processos.
 
 ## **Placar da dupla** 
 
 |**Experimento**|**Quem saiu melhor?**|**Para microsserviços, é poder ou**<br>**problema?**|
 |---|---|---|
-|Bug fatal (demonstração)|||
-|1 · Deploy|||
-|2 · Latência|||
-|3 · Consistência|||
-|4 · Operação|||
+|Bug fatal (demonstração)|Microsserviços (degradação parcial)|Poder|
+|1 · Deploy|Microsserviços|Poder|
+|2 · Latência|Monolito|Problema|
+|3 · Consistência|Monolito (consistência forte)|Problema (trade-off de consistência)|
+|4 · Operação|Monolito (simplicidade)|Problema (maior complexidade operacional)|
 
 
 **Para fechar** Uma loja com **3 desenvolvedores** deveria usar qual das duas versões? E uma com **300** ? Usem o placar como argumento. 
+
+**Resposta estimada para discussão final:**
+- Com 3 desenvolvedores: monolito tende a ser melhor pela simplicidade, menor custo de operação e depuração mais direta.
+- Com 300 desenvolvedores: microsserviços tendem a ser melhores pela autonomia de times, deploy independente e escalabilidade organizacional.
 
 Para recomeçar do zero: desliguem tudo (Ctrl+C nos terminais) e rodem `python resetar.py`. 
 
