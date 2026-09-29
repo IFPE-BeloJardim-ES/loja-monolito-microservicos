@@ -2,7 +2,7 @@
 
 Estilos Arquiteturais V · Microsserviços 
 
-Nomes: ____________________________________ 
+Nomes: José Victor
 
 Vocês vão rodar a **mesma loja** de dois jeitos: como um **monolito** (um processo, um banco) e como **microsserviços** (quatro processos, um banco por serviço). As duas versões têm as mesmas rotas. Ninguém precisa programar — só um experimento pede para mudar um número no código. 
 
