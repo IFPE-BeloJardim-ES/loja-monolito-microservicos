@@ -111,24 +111,27 @@ Essa é a essência do trade-off descrito no teorema CAP: com uma falha de rede/
 |Quantos processos estão rodando?|1|4 (Catálogo, Estoque, Pedidos, Vitrine)|
 |Quantas portas?|1 (8000)|4 (9000, 9001, 9002, 9003)|
 |Quantos arquivos de banco?|1 (monolito.json)|2 (estoque.json, pedidos.json)|
-|Quantas linhas de log apareceram?|||
-|Em quantos serviços?|
+|Quantas linhas de log apareceram?|1|4|
+|Em quantos serviços?|1|4|
 
 
 **Responda** Se a compra desse errado, onde vocês procurariam o erro em cada versão? 
+
+No monolito, a busca começa no mesmo processo: qualquer erro de compra, estoque ou pedido está dentro do mesmo código e no mesmo banco, então vocês olhariam primeiro em `monolito.py` e em `dados/monolito.json`. Em microsserviços, a falha pode estar em qualquer elo da cadeia: Vitrine, Pedidos, Catálogo ou Estoque. Por isso, o diagnóstico passa a ser distribuído — o erro costuma aparecer no serviço que respondeu com status ruim ou no ponto anterior da chamada, porque cada etapa vive em um processo e porta diferentes.
 
 ## **Placar da dupla** 
 
 |**Experimento**|**Quem saiu melhor?**|**Para microsserviços, é poder ou**<br>**problema?**|
 |---|---|---|
-|Bug fatal (demonstração)|||
-|1 · Deploy|||
-|2 · Latência|||
-|3 · Consistência|||
-|4 · Operação|||
-
+|Bug fatal (demonstração)|Microsserviços|Poder|
+|1 · Deploy|Microsserviços|Poder|
+|2 · Latência|Monolito|Problema|
+|3 · Consistência|Monolito|Problema|
+|4 · Operação|Monolito|Problema|
 
 **Para fechar** Uma loja com **3 desenvolvedores** deveria usar qual das duas versões? E uma com **300** ? Usem o placar como argumento. 
+
+Com 3 pessoas, o monolito costuma ser a melhor escolha. Ele é mais simples de rodar, depurar e operar, e o placar mostra que os microsserviços ganham principalmente em resiliência e isolamento de deploy, mas pagam em latência, complexidade operacional e consistência. Com 300 pessoas, a versão em microsserviços faz mais sentido: o time pode se dividir por domínio, os deploys ficam independentes e o risco de uma mudança ruim fica mais isolado. Em escala grande, a complexidade operacional e de coordenação do monolito tende a ser mais custosa do que os ganhos de simplicidade.
 
 Para recomeçar do zero: desliguem tudo (Ctrl+C nos terminais) e rodem `python resetar.py`. 
 
